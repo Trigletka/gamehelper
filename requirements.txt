@@ -1,6 +1,6 @@
 telebot
 time
 pytelegrambotapi
-bs4
+beautifulsoup4
 requests
 langdetect
