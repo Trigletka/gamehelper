@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import requests
 from langdetect import detect
 
+
+#Это написал инвалид
 invalid_messages = ['поиск игр', "календарь выхода игр", "назад", '/calendar', '/search']
 def greeting(time):
     if 5 < time < 11:
