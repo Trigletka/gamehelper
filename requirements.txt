@@ -1,0 +1,6 @@
+telebot
+time
+pytelegrambotapi
+bs4
+requests
+langdetect
