@@ -51,15 +51,6 @@ def start_message(message):
 current_section = None
 
 
-@bot.message_handler(content_types=['text'])
-def handle_text(message):
-    global current_section
-    if message.text.lower() == 'сменить раздел':
-        current_section = None
-    elif current_section is None:
-        bot.send_message(message.chat.id, 'Выберите раздел с помощью команды "сменить раздел"')
-
-
 @bot.message_handler(commands=['calendar'])
 def calendar(message):
     url = 'https://stopgame.ru/games/dates/2023/' + str(localtime()[1])
@@ -91,10 +82,10 @@ def next_month(call):
     url = None
     c = 0
     if call.data == 'rght':
-        url = 'https://stopgame.ru/games/dates/2023/' + str(localtime()[1]+1)
+        url = 'https://stopgame.ru/games/dates/2023/' + str(localtime()[1] + 1)
         c = 1
     elif call.data == 'lft':
-        url = 'https://stopgame.ru/games/dates/2023/' + str(localtime()[1]-1)
+        url = 'https://stopgame.ru/games/dates/2023/' + str(localtime()[1] - 1)
         c = -1
     elif call.data == 'cur':
         url = 'https://stopgame.ru/games/dates/2023/' + str(localtime()[1])
@@ -117,55 +108,50 @@ def next_month(call):
     for key, value in dates.items():
         x.append(f"{key}:\n     {value}")
 
-    bot.send_message(call.message.chat.id, "Календарь выхода игр на " + monthes[localtime()[1]+c - 1] + ':\n' + '\n'.join(x),
+    bot.send_message(call.message.chat.id,
+                     "Календарь выхода игр на " + monthes[localtime()[1] + c - 1] + ':\n' + '\n'.join(x),
                      reply_markup=keyboard_calendar)
 
 
 @bot.message_handler(commands=['search'])
 @bot.message_handler(content_types=['text'])
 def find_game(message):
-    global current_section
     if message.text.lower() == '/search':
-        if current_section == 'some_section':
-            if message.text == '/search':
-                bot.send_message(message.chat.id, 'Введите точное название игры на английском.', reply_markup=keyboard2)
-            url = 'https://stopgame.ru/game/' + correct_name(message.text.lower().replace(' ', '_'))
-            response = requests.get(url)
-            soup = BeautifulSoup(response.text, 'lxml')
+        bot.send_message(message.chat.id, 'Введите точное название игры на английском.', reply_markup=keyboard2)
+    url = 'https://stopgame.ru/game/' + correct_name(message.text.lower().replace(' ', '_'))
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
 
-            images = soup.find_all('img', class_='_image_sh7r2_31')
-            for image in images:
-                src = image.get("src")
-                if src:
-                    bot.send_photo(message.chat.id, src,
-                                       caption=f'{url} \nПользовательская оценка: ' +
-                                               str(soup.find('span', class_="_users-rating__total_sh7r2_1").text))
-            if not images and not (message.text.lower() in invalid_messages):
-                    bot.send_message(message.chat.id, 'Игра не найдена.')
+    images = soup.find_all('img', class_='_image_sh7r2_31')
+    for image in images:
+        src = image.get("src")
+        if src:
+            bot.send_photo(message.chat.id, src,
+                           caption=f'{url} \nПользовательская оценка: ' +
+                                   str(soup.find('span', class_="_users-rating__total_sh7r2_1").text))
+        if not images and not (message.text.lower() in invalid_messages):
+            bot.send_message(message.chat.id, 'Игра не найдена.')
 
-            if soup.find('div', class_="_description__inner_qrsvr_1"):
-                bot.send_message(message.chat.id,
-                                     '📄Краткое описание:📄 \n' + soup.find('div', class_="_description__inner_qrsvr_1").text)
+        if soup.find('div', class_="_description__inner_qrsvr_1"):
+            bot.send_message(message.chat.id,
+                             '📄Краткое описание:📄 \n' + soup.find('div', class_="_description__inner_qrsvr_1").text)
 
-            if soup.find('div', class_="_screenshot-grid_qrsvr_506"):
-                screenshots = soup.find('div', class_="_screenshot-grid_qrsvr_506").find_all('a')
-                bot.send_message(message.chat.id, 'Скриншоты:')
-                x = []
-                for screenshot in screenshots:
-                    href = screenshot.get('href')
-                    if href:
-                        x.append(telebot.types.InputMediaPhoto(href))
-                bot.send_media_group(message.chat.id, x)
+        if soup.find('div', class_="_screenshot-grid_qrsvr_506"):
+            screenshots = soup.find('div', class_="_screenshot-grid_qrsvr_506").find_all('a')
+            bot.send_message(message.chat.id, 'Скриншоты:')
+            x = []
+            for screenshot in screenshots:
+                href = screenshot.get('href')
+                if href:
+                    x.append(telebot.types.InputMediaPhoto(href))
+            bot.send_media_group(message.chat.id, x)
 
-            if soup.find('div', class_="_facts__text_qrsvr_1"):
-                    bot.send_message(message.chat.id,
-                                     'Интересный факт: ' + str(soup.find('div', class_="_facts__text_qrsvr_1").text))
-            if message.text.lower() == 'назад':
-                    bot.send_message(message.chat.id, '👇Выберите одну из функций ниже:👇', reply_markup=keyboard1)
-            else:
-                pass
-        else:
-            bot.send_message(message.chat.id, 'Выберите раздел с помощью команды "сменить раздел"')
+        if soup.find('div', class_="_facts__text_qrsvr_1"):
+            bot.send_message(message.chat.id,
+                             'Интересный факт: ' + str(soup.find('div', class_="_facts__text_qrsvr_1").text))
+        if message.text.lower() == 'назад':
+            bot.send_message(message.chat.id, '👇Выберите одну из функций ниже:👇', reply_markup=keyboard1)
+            pass
 
 
 bot.polling()
