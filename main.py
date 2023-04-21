@@ -5,8 +5,9 @@ import requests
 from langdetect import detect
 
 
-#Это написал инвалид
 invalid_messages = ['поиск игр', "календарь выхода игр", "назад", '/calendar', '/search']
+
+
 def greeting(time):
     if 5 < time < 11:
         return ' Доброе утро. Я помогу найти тебе игру, а также подскажу ближайшие выходы игр'
@@ -33,9 +34,8 @@ keyboard1 = telebot.types.ReplyKeyboardMarkup(True)
 keyboard2 = telebot.types.ReplyKeyboardMarkup(True).row('Назад')
 reply_markup = keyboard1.row("Поиск игр", "Календарь выхода игр")
 
-bot = telebot.TeleBot('6063851788:AAGLdSZW3L0WcBY33seBL8iYoPsXM-NSIfc')
-
-
+TOKEN = '6063851788:AAGLdSZW3L0WcBY33seBL8iYoPsXM-NSIfc'
+bot = telebot.TeleBot(TOKEN)
 
 
 @bot.message_handler(commands=['start'])
