@@ -153,5 +153,4 @@ def find_game(message):
             bot.send_message(message.chat.id, '👇Выберите одну из функций ниже:👇', reply_markup=keyboard1)
             pass
 
-
-bot.polling()
+bot.infinity_polling()
